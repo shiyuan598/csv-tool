@@ -9,7 +9,8 @@
   "scripts": {
     "start": "electron .",
     "build-win": "electron-builder --win",
-    "build-mac": "electron-builder --mac"
+    "build-mac": "electron-builder --mac",
+    "package": "electron-packager . MyApp --platform=win32 --arch=x64 --overwrite"
   },
   "build": {
     "appId": "com.example.app",
@@ -20,5 +21,8 @@
   },
   "author": "",
   "license": "ISC",
-  "description": ""
+  "description": "",
+  "dependencies": {
+    "electron-packager": "^17.1.2"
+  }
 }

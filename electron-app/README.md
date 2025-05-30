@@ -36,7 +36,7 @@ npm start
 使用 Electron Builder 打包成 Windows 安装程序：
 
 ```bash
-npm run package-win
+npm run build-win
 ```
 
 打包完成后，在 `dist` 目录下会生成 `win-unpacked` 文件夹，其中包含可执行 文件。
@@ -47,5 +47,5 @@ npm run package-win
 使用 Electron Builder 打包成 macOS 应用：
 
 ```bash
-npm run package-mac
+npm run build-mac
 ```
