@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CSV 合并编辑器 Demo</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/element-plus/dist/index.css"
+    />
+    <style>
+      body {
+        padding: 20px;
+        font-family: Arial, sans-serif;
+      }
+      .el-input__inner {
+        min-width: 100px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <!-- <input type="file" multiple /> -->
+      <input
+        type="file"
+        ref="hiddenInput"
+        multiple
+        accept=".csv"
+        style="display: none"
+        @change="handleFileInput"
+      />
+      <el-upload
+        :file-list="fileList"
+        :auto-upload="false"
+        :on-remove="handleRemove"
+        :on-change="handleChange"
+        :http-request="() => {}"
+        action="#"
+        :show-file-list="true"
+        :disabled="true"
+      >
+        <el-button type="primary" @click="openFileInput"
+          >导入 CSV 文件</el-button
+        >
+      </el-upload>
+
+      <el-button style="margin-top: 20px" type="success" @click="exportCSV">
+        导出为 CSV
+      </el-button>
+      <el-table :data="tableData" style="margin-top: 20px; width: 100%">
+        <el-table-column
+          v-for="col in columns"
+          :key="col"
+          :label="col"
+          :prop="col"
+        >
+          <template #default="{ row }">
+            <el-input
+              v-if="col === '描述'"
+              v-model="row[col]"
+              size="small"
+              placeholder="描述"
+              type="textarea"
+              autosize
+            ></el-input>
+            <el-select
+              v-else-if="col === '标签'"
+              v-model="row[col]"
+              size="small"
+              multiple
+              placeholder="选择标签"
+              style="width: 100px"
+            >
+              <el-option label="压线" value="压线"></el-option>
+              <el-option label="识别不稳" value="识别不稳"></el-option>
+              <el-option label="路障无" value="路障无"></el-option>
+              <el-option label="急加速" value="急加速"></el-option>
+            </el-select>
+            <span v-else>{{ row[col] }}</span>
+          </template>
+        </el-table-column>
+      </el-table>
+    </div>
+
+    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+    <script src="https://unpkg.com/element-plus"></script>
+    <script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js"></script>
+    <script>
+      const { createApp, reactive, ref } = Vue;
+
+      const app = createApp({
+        setup() {
+          const hiddenInput = ref(null);
+          const fileList = ref([]);
+          const tableData = ref([]);
+          const columns = ref([]);
+
+          const openFileInput = () => {
+            hiddenInput.value && hiddenInput.value.click();
+          };
+
+          const handleFileInput = (e) => {
+            console.info("读取文件");
+            const files = Array.from(e.target.files || []);
+            fileList.value.push(
+              ...files.map((file) => ({
+                name: file.name,
+                raw: file
+              }))
+            );
+
+            readCsvFiles(files);
+            e.target.value = ""; // reset input for next selection
+          };
+
+          const readCsvFiles = (files) => {
+            files.forEach((file) => {
+              const reader = new FileReader();
+              reader.onload = () => {
+                const lines = reader.result.split(/\r?\n/).filter(Boolean);
+                if (!lines.length) return;
+
+                const headers = lines[0].split(",");
+                if (!columns.value.length) columns.value = headers;
+
+                const newRows = lines.slice(1).map((line) => {
+                  const values = line.split(",").map((v) => v.trim());
+                  return Object.fromEntries(
+                    headers.map((h, i) => [h, values[i] || ""])
+                  );
+                });
+
+                tableData.value.push(...newRows);
+              };
+              reader.readAsText(file);
+            });
+          };
+
+          const handleRemove = (file, fileListNew) => {
+            fileList.value = fileListNew;
+            // 可选：也可以同步更新 tableData（但通常没必要）
+          };
+
+          function handleFiles(uploadFile, uploadFiles) {
+            console.info("导入文件了");
+            tableData.value = [];
+            columns.value = [];
+
+            let allRows = [];
+            let colSet = new Set();
+            let files = uploadFiles.map((f) => f.raw);
+
+            let filesProcessed = 0;
+            files.forEach((file) => {
+              Papa.parse(file, {
+                header: true,
+                skipEmptyLines: true,
+                complete: function (results) {
+                  if (results.meta.fields) {
+                    results.meta.fields.forEach((f) => colSet.add(f));
+                  }
+                  allRows = allRows.concat(results.data);
+                  filesProcessed++;
+                  if (filesProcessed === files.length) {
+                    columns.value = Array.from(colSet);
+                    // 填充缺失字段为空字符串
+                    tableData.value = allRows.map((row) => {
+                      const fullRow = {};
+                      columns.value.forEach((col) => {
+                        fullRow[col] = row[col] ?? "";
+                      });
+                      return fullRow;
+                    });
+                  }
+                }
+              });
+            });
+          }
+
+          function exportCSV() {
+            const csv = Papa.unparse(tableData.value);
+            const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "merged.csv";
+            link.click();
+            link.remove();
+          }
+
+          return {
+            tableData,
+            columns,
+            hiddenInput,
+            fileList,
+            tableData,
+            columns,
+            openFileInput,
+            handleFileInput,
+            handleRemove,
+            handleFiles,
+            exportCSV
+          };
+        }
+      });
+
+      app.use(ElementPlus);
+      app.mount("#app");
+    </script>
+  </body>
+</html>
