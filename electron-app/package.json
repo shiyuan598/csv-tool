@@ -3,14 +3,15 @@
   "version": "1.0.0",
   "main": "main.js",
   "devDependencies": {
-    "electron": "^36.3.2",
-    "electron-builder": "^26.0.12"
+    "@electron-forge/cli": "^7.8.1",
+    "electron": "^36.3.2"
   },
   "scripts": {
-    "start": "electron .",
+    "start": "electron-forge start",
     "build-win": "electron-builder --win",
     "build-mac": "electron-builder --mac",
-    "package": "electron-packager . MyApp --platform=win32 --arch=x64 --overwrite"
+    "package": "electron-forge package",
+    "make": "electron-forge make"
   },
   "build": {
     "appId": "com.example.app",
@@ -21,7 +22,7 @@
   },
   "author": "",
   "license": "ISC",
-  "description": "",
+  "description": "electron app",
   "dependencies": {
     "electron-packager": "^17.1.2"
   }
