@@ -14,8 +14,7 @@
     "build-mac": "electron-builder --mac",
     "forge-package": "electron-forge package",
     "forge-make": "electron-forge make",
-    "package:win": "electron-packager . MyApp --platform=win32 --arch=x64 --electron-version=36.3.2 --overwrite --electronZip=./electron-zip/electron-v36.3.2-win32-x64.zip --out=dist",
-    "package:mac": "electron-packager . MyApp --platform=darwin --arch=arm64 --electron-version=36.3.2 --overwrite --electronZip=./electron-zip/electron-v36.3.2-darwin-arm64.zip --out=dist",
+    "package-win": "node scripts/package-win.js",
     "package-mac": "node scripts/package-mac.js"
   },
   "build": {
