@@ -1,0 +1,75 @@
+{
+  "name": "my-electron-app",
+  "version": "1.0.0",
+  "main": "main.js",
+  "devDependencies": {
+    "@electron-forge/cli": "^7.8.1",
+    "electron": "^36.3.2",
+    "electron-builder": "^26.0.12",
+    "electron-packager": "^17.1.2"
+  },
+  "scripts": {
+    "start": "electron-forge start",
+    "build-win": "electron-builder --win",
+    "build-mac": "electron-builder --mac",
+    "forge-package": "electron-forge package",
+    "forge-make": "electron-forge make",
+    "package:win": "electron-packager . MyApp --platform=win32 --arch=x64 --electron-version=36.3.2 --overwrite --electronZip=./electron-zip/electron-v36.3.2-win32-x64.zip --out=dist",
+    "package:mac": "electron-packager . MyApp --platform=darwin --arch=arm64 --electron-version=36.3.2 --overwrite --electronZip=./electron-zip/electron-v36.3.2-darwin-arm64.zip --out=dist",
+    "package-mac": "node scripts/package-mac.js"
+  },
+  "build": {
+    "appId": "com.example.app",
+    "productName": "MyApp",
+    "directories": {
+      "output": "dist",
+      "buildResources": "assets"
+    },
+    "files": [
+      "**/*",
+      "!node_modules/*/{test,__tests__,examples}/**",
+      "!**/*.md"
+    ],
+    "asar": true,
+    "compression": "maximum",
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "assets/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowElevation": true,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "MyApp"
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "arm64"
+          ]
+        }
+      ],
+      "category": "public.app-category.utilities",
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "assets/entitlements.plist",
+      "entitlementsInherit": "assets/entitlements.plist",
+      "icon": "assets/icon.icns"
+    }
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "electron app"
+}
