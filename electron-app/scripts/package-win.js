@@ -9,7 +9,7 @@ const options = {
   electronVersion: '36.3.2', // Electron 版本
   overwrite: true, // 覆盖已有输出
   out: 'dist', // 输出目录
-  electronZip: path.resolve(__dirname, '../electron-zip/electron-v36.3.2-win32-x64.zip'),
+  electronZip: path.resolve(__dirname, '../electron-zip/electron.exe'),
   icon: path.resolve(__dirname, '../assets/icon.ico'), // Windows 必须用 .ico
   win32metadata: {
     CompanyName: 'Your Company',
